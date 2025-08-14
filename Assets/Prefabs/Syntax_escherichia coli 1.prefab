@@ -1,0 +1,507 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2681412376407659450
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1627759047245322012}
+  - component: {fileID: 4111685409206280192}
+  - component: {fileID: 8278648969897924247}
+  - component: {fileID: 8827084088945627334}
+  - component: {fileID: -8807210993060047748}
+  - component: {fileID: 97444232357038674}
+  - component: {fileID: 5911298873368662827}
+  - component: {fileID: -526256702675971943}
+  m_Layer: 8
+  m_Name: Syntax_escherichia coli 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1627759047245322012
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2681412376407659450}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
+--- !u!33 &4111685409206280192
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2681412376407659450}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &8278648969897924247
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2681412376407659450}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 373ab488b2a994154a6eac6c48824a93, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!136 &8827084088945627334
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2681412376407659450}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-8807210993060047748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2681412376407659450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8133dc7fa4554977889526268e39c11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  genomeAsset: {fileID: 11400000, guid: 986e6478c78d840448efbd19b57f15e3, type: 2}
+  genome: {fileID: 0}
+  birthMaterial: {fileID: 2100000, guid: 373ab488b2a994154a6eac6c48824a93, type: 2}
+  conjugationRate: 0.075
+  conjugationRadius: 1
+  agentLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
+  transformationRate: 0.075
+  deadCellLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
+  transductionRate: 0.2
+  phagePrefab: {fileID: 8492669511363720945, guid: 38f2ee68a706949f59f18c662ba95da6, type: 3}
+  phageLifetime: 5
+  nutrientLayerMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  nutrientTypes:
+  - tag: NutrientSource1
+    baseEnergyValue: 25
+    maxEnergyYield: 25
+  - tag: NutrientSource2
+    baseEnergyValue: 5
+    maxEnergyYield: 25
+  - tag: NutrientSource3
+    baseEnergyValue: 2
+    maxEnergyYield: 25
+  - tag: NutrientSource4
+    baseEnergyValue: 1
+    maxEnergyYield: 0
+  - tag: NutrientSource
+    baseEnergyValue: 12
+    maxEnergyYield: 25
+  initialEnergy: 120
+  agentPrefab: {fileID: 2681412376407659450}
+  divisionOffset: 0.5
+  deadLifetime: 30
+  speedCostMultiplier: 0.025
+  sensorCostMultiplier: 0.05
+  maxPopulation: 1500
+  ageThreshold: 40
+  maxAge: 65
+  maxReplications: 20
+  state: 0
+  generation: 0
+--- !u!82 &97444232357038674
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2681412376407659450}
+  m_Enabled: 0
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 10
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!165 &5911298873368662827
+AudioHighPassFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2681412376407659450}
+  m_Enabled: 1
+  m_CutoffFrequency: 400
+  m_HighpassResonanceQ: 1
+--- !u!114 &-526256702675971943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2681412376407659450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89381fe0c83154096a51200ea9a5307d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  oscillator1:
+    Sine_Mix: 1
+    Square_Mix: 0
+    Sawtooth_Mix: 0
+    Triangle_Mix: 0
+    Ramp_Mix: 0
+    Wavetable_Mix: 0
+    Harmonics:
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    Frequency: 440
+    Amplitude: 0.5
+    Offset: 0
+  oscillator2:
+    Sine_Mix: 1
+    Square_Mix: 0
+    Sawtooth_Mix: 0
+    Triangle_Mix: 0
+    Ramp_Mix: 0
+    Wavetable_Mix: 0
+    Harmonics:
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    Frequency: 440
+    Amplitude: 0.5
+    Offset: 0
+  audioOperations:
+    Operation: 0
+    PreOp_Multiply: 1
+    PreOp_Add: 0
+    PostOp_Multiply: 1
+    PostOp_Add: 0
+  waveshaper:
+    Enabled: 0
+    Shape: 1
+    Drive: 1
+    Mix: 1
+  frequencyFilters:
+  - Enabled: 1
+    Type: 0
+    Cutoff: 20000
+    Resonance: 1
+    Cutoff_Mod_Amount: 0
+    Resonance_Mod_Amount: 0
+  - Enabled: 1
+    Type: 0
+    Cutoff: 20000
+    Resonance: 1
+    Cutoff_Mod_Amount: 0
+    Resonance_Mod_Amount: 0
+  - Enabled: 1
+    Type: 0
+    Cutoff: 20000
+    Resonance: 1
+    Cutoff_Mod_Amount: 0
+    Resonance_Mod_Amount: 0
+  - Enabled: 1
+    Type: 0
+    Cutoff: 20000
+    Resonance: 1
+    Cutoff_Mod_Amount: 0
+    Resonance_Mod_Amount: 0
+  eqBands:
+  - Enabled: 1
+    Frequency: 1000
+    Bandwidth: 3
+    Boost_dB: 0
+    Frequency_Mod_Amount: 0
+    Bandwidth_Mod_Amount: 0
+    Boost_Mod_Amount: 0
+  - Enabled: 1
+    Frequency: 1000
+    Bandwidth: 3
+    Boost_dB: 0
+    Frequency_Mod_Amount: 0
+    Bandwidth_Mod_Amount: 0
+    Boost_Mod_Amount: 0
+  - Enabled: 1
+    Frequency: 1000
+    Bandwidth: 3
+    Boost_dB: 0
+    Frequency_Mod_Amount: 0
+    Bandwidth_Mod_Amount: 0
+    Boost_Mod_Amount: 0
+  combFilter:
+    Enabled: 0
+    Delay_ms: 20
+    Feedback: 0.5
+    Mix: 0.5
+  lfo1:
+    Sine_Mix: 1
+    Square_Mix: 0
+    Sawtooth_Mix: 0
+    Triangle_Mix: 0
+    Ramp_Mix: 0
+    Wavetable_Mix: 0
+    Harmonics:
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    Frequency: 440
+    Amplitude: 0.5
+    Offset: 0
+  lfo2:
+    Sine_Mix: 1
+    Square_Mix: 0
+    Sawtooth_Mix: 0
+    Triangle_Mix: 0
+    Ramp_Mix: 0
+    Wavetable_Mix: 0
+    Harmonics:
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    Frequency: 440
+    Amplitude: 0.5
+    Offset: 0
+  lfoOperations:
+    Operation: 0
+    PreOp_Multiply: 1
+    PreOp_Add: 0
+    PostOp_Multiply: 1
+    PostOp_Add: 0
+  modMatrix:
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  Limiter_Threshold_dB: -0.1
+  Limiter_Attack_ms: 5
+  Limiter_Release_ms: 100
+  Output_Peak_dB: -60

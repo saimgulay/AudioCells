@@ -1,0 +1,12 @@
+{
+    "inputSize": 1,
+    "outputSize": 1,
+    "learningRate": 0.009999999776482582,
+    "iterations": 1000,
+    "bias": [
+        -0.17033523321151734
+    ],
+    "weights": [
+        13.503575325012207
+    ]
+}

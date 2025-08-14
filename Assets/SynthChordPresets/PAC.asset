@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86f1b3ca9646b4e4ea20015219dbe79a, type: 3}
+  m_Name: PAC
+  m_EditorClassIdentifier: 
+  presetName: PAC
+  label: 
+  tetrachord1: '[0,16,19,24] '
+  tetrachord2: '[0,17,21,24]'
+  tetrachord3: '[2,17,21,21]'
+  tetrachord4: '[7,14,19,23]'
+  tetrachord5: '[0,16,,19,24]'
+  lastChordMultiplier: 3
+  chordMasterGain: 1
+  sustainDuration: 0.5
+  interChordPause: 0.1
+  restDuration: 1
+  enableLowPass: 1
+  maxCutoff: 12000
+  cutoffMultiplier: 1.2
+  attackTime: 0.1
+  decayTime: 0.1
+  sustainLevel: 0.89
+  releaseTime: 0.2
+  baseFrequency: 130.815

@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea68e62881b2e4f2f92a0de78d683f8f, type: 3}
+  m_Name: E Coli Genome
+  m_EditorClassIdentifier: 
+  runSpeedFactor: 1
+  tumbleSensitivity: 1
+  metabolismRate: 0.71
+  reproductionThreshold: 150
+  optimalTemperature: 25
+  temperatureSensitivity: 0.1
+  optimalPH: 7
+  pHSensitivity: 0.1
+  toxinResistance: 0.05
+  uvResistance: 0.05
+  nutrientEfficiencyA: 20
+  nutrientEfficiencyB: 0.2
+  nutrientEfficiencyC: 0.2
+  nutrientEfficiencyD: 0.2
+  chemotaxisMemoryLength: 7
+  baseTumbleRate: 0.5
+  tumbleSlopeSensitivity: 1
+  tumbleAngleRange: 45
+  explorationTendency: 0.882
+  gradientTolerance: 0.01
+  decisionNoise: 0.01
+  temperaturePlasticity: 0.053
+  pHPlasticity: 0.018
+  starvationTolerance: 2
+  deathDelayBias: 0.1
+  restBehavior: 0.061
+  nutrientDiscrimination: 0
+  deadCellPreference: 0.397
+  conjugationAggressiveness: 0.1
+  geneticStability: 0.775
+  baseRunSpeed: 2
+  tumbleDuration: 1
+  generalMutationRate: 0.03
+  lethalMutationRate: 0.005
+  mutationRates:
+    runSpeedFactor: 1
+    tumbleSensitivity: 0.01
+    metabolismRate: 0.01
+    reproductionThreshold: 0.005
+    optimalTemperature: 10
+    temperatureSensitivity: 0.05
+    optimalPH: 10
+    pHSensitivity: 0.05
+    toxinResistance: 10
+    uvResistance: 10
+    nutrientEfficiencyA: 0.1
+    nutrientEfficiencyB: 0.1
+    nutrientEfficiencyC: 0.1
+    nutrientEfficiencyD: 0.1
+    chemotaxisMemoryLength: 0.4
+    baseTumbleRate: 0.4
+    tumbleSlopeSensitivity: 0.01
+    tumbleAngleRange: 0.01
+    explorationTendency: 0.01
+    gradientTolerance: 0.01
+    decisionNoise: 0.075
+    temperaturePlasticity: 0.01
+    pHPlasticity: 0.01
+    starvationTolerance: 0.01
+    deathDelayBias: 0.01
+    restBehavior: 0.01
+    nutrientDiscrimination: 0.01
+    deadCellPreference: 0.132
+    conjugationAggressiveness: 0.08
+    geneticStability: 0.256
+    baseRunSpeed: 0.15
+    tumbleDuration: 0.15
+    sensorRadius: 0.005
+    divisionDelay: 0.1
+    selfPreservation: 0.1
+    dormancyThreshold: 0.05
+    wakeUpEnergyCost: 0.05
+    toxinProductionRate: 0.05
+    toxinPotency: 0.05
+    biofilmTendency: 0.05
+    biofilmMatrixCost: 0.05
+    quorumSensingThreshold: 0.05
+    quorumToxinBoost: 0.05
+    kinRecognitionFidelity: 0.05
+    kinCooperationBonus: 0.05
+    stressInducedMutabilityFactor: 0.05
+    plasmidCompatibilityThreshold: 0.05
+  sensorRadius: 1.5
+  divisionDelay: 1
+  selfPreservation: 0.05
+  dormancyThreshold: 1.5
+  wakeUpEnergyCost: 1
+  toxinProductionRate: 0.025
+  toxinPotency: 0.5
+  biofilmTendency: 0.1
+  biofilmMatrixCost: 0.05
+  quorumSensingThreshold: 5
+  quorumToxinBoost: 2
+  kinRecognitionFidelity: 0.5
+  kinCooperationBonus: 1.5
+  stressInducedMutabilityFactor: 1
+  plasmidCompatibilityThreshold: 2
