@@ -1,0 +1,230 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb7cf3f61969d4ef48f88989f78ed253, type: 3}
+  m_Name: new_-e
+  m_EditorClassIdentifier: 
+  presetName: new -e
+  label: 
+  oscillator1:
+    Sine_Mix: 0
+    Square_Mix: 0
+    Sawtooth_Mix: 0
+    Triangle_Mix: 0
+    Ramp_Mix: 0
+    Wavetable_Mix: 1
+    Harmonics:
+    - 1
+    - 0.1
+    - 0.03
+    - 0.05
+    - 0.4
+    - 0.02
+    - 0.03
+    - 0.01
+    - 0.15
+    - 0.2
+    - 0.03
+    - 0.02
+    - 0.1
+    - 0.01
+    - 0.005
+    - 0.002
+    Frequency: 110
+    Amplitude: 0.6
+    Offset: 0
+  oscillator2:
+    Sine_Mix: 0
+    Square_Mix: 0
+    Sawtooth_Mix: 0
+    Triangle_Mix: 0
+    Ramp_Mix: 0
+    Wavetable_Mix: 0
+    Harmonics:
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    Frequency: 440
+    Amplitude: 0
+    Offset: 0
+  audioOperations:
+    Operation: 0
+    PreOp_Multiply: 1
+    PreOp_Add: 0
+    PostOp_Multiply: 1
+    PostOp_Add: 0
+  waveshaper:
+    Enabled: 0
+    Shape: 1
+    Drive: 1
+    Mix: 1
+  frequencyFilters:
+  - Enabled: 1
+    Type: 0
+    Cutoff: 20000
+    Resonance: 1
+    Cutoff_Mod_Amount: 0
+    Resonance_Mod_Amount: 0
+  - Enabled: 1
+    Type: 0
+    Cutoff: 20000
+    Resonance: 1
+    Cutoff_Mod_Amount: 0
+    Resonance_Mod_Amount: 0
+  - Enabled: 1
+    Type: 0
+    Cutoff: 20000
+    Resonance: 1
+    Cutoff_Mod_Amount: 0
+    Resonance_Mod_Amount: 0
+  - Enabled: 1
+    Type: 0
+    Cutoff: 20000
+    Resonance: 1
+    Cutoff_Mod_Amount: 0
+    Resonance_Mod_Amount: 0
+  eqBands:
+  - Enabled: 0
+    Frequency: 0
+    Bandwidth: 0
+    Boost_dB: 0
+    Frequency_Mod_Amount: 0
+    Bandwidth_Mod_Amount: 0
+    Boost_Mod_Amount: 0
+  - Enabled: 0
+    Frequency: 0
+    Bandwidth: 0
+    Boost_dB: 0
+    Frequency_Mod_Amount: 0
+    Bandwidth_Mod_Amount: 0
+    Boost_Mod_Amount: 0
+  - Enabled: 0
+    Frequency: 0
+    Bandwidth: 0
+    Boost_dB: 0
+    Frequency_Mod_Amount: 0
+    Bandwidth_Mod_Amount: 0
+    Boost_Mod_Amount: 0
+  combFilter:
+    Enabled: 0
+    Delay_ms: 20
+    Feedback: 0.5
+    Mix: 0.5
+  lfo1:
+    Sine_Mix: 1
+    Square_Mix: 0
+    Sawtooth_Mix: 0
+    Triangle_Mix: 0
+    Ramp_Mix: 0
+    Wavetable_Mix: 0
+    Harmonics:
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    Frequency: 440
+    Amplitude: 0.5
+    Offset: 0
+  lfo2:
+    Sine_Mix: 1
+    Square_Mix: 0
+    Sawtooth_Mix: 0
+    Triangle_Mix: 0
+    Ramp_Mix: 0
+    Wavetable_Mix: 0
+    Harmonics:
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    Frequency: 440
+    Amplitude: 0.5
+    Offset: 0
+  lfoOperations:
+    Operation: 0
+    PreOp_Multiply: 1
+    PreOp_Add: 0
+    PostOp_Multiply: 1
+    PostOp_Add: 0
+  modMatrix:
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  Limiter_Threshold_dB: -0.1
+  Limiter_Attack_ms: 5
+  Limiter_Release_ms: 100
+  Output_Peak_dB: -4.3872232

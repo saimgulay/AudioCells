@@ -1,0 +1,234 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb7cf3f61969d4ef48f88989f78ed253, type: 3}
+  m_Name: Vocal_Beat_Box_04
+  m_EditorClassIdentifier: 
+  presetName: Vocal Beat Box 04
+  label: ih, chip, phst
+  oscillator1:
+    Sine_Mix: 0.189
+    Square_Mix: 0.209
+    Sawtooth_Mix: 0.229
+    Triangle_Mix: 0.633
+    Ramp_Mix: 0.276
+    Wavetable_Mix: 0.707
+    Harmonics:
+    - 1.21
+    - 0.33
+    - 0.42
+    - 1.02
+    - 0.15
+    - 0.33
+    - 0.36
+    - 1.02
+    - 0.18
+    - 0.75
+    - 0.63
+    - 0.03
+    - 0.12
+    - 0.6
+    - 0.48
+    - 0.78
+    Frequency: 118.3
+    Amplitude: 1
+    Amplitude_Boost: 0
+    Offset: 0
+  oscillator2:
+    Sine_Mix: 0.788
+    Square_Mix: 0.101
+    Sawtooth_Mix: 0.315
+    Triangle_Mix: 0.68
+    Ramp_Mix: 0.238
+    Wavetable_Mix: 0.68
+    Harmonics:
+    - 1
+    - 0.38
+    - 0.78
+    - 0.72
+    - 0.3
+    - 0.45
+    - 0.45
+    - 0.03
+    - 0.51
+    - 0.51
+    - 0.19
+    - 0.24
+    - 0.15
+    - 0.33
+    - 0.15
+    - 0.27
+    Frequency: 302.84
+    Amplitude: 1
+    Amplitude_Boost: 0
+    Offset: 0
+  audioOperations:
+    Operation: 2
+    PreOp_Multiply: 1
+    PreOp_Add: 0
+    PostOp_Multiply: 1
+    PostOp_Add: 0
+  waveshaper:
+    Enabled: 1
+    Shape: 3
+    Drive: 11.7
+    Mix: 0.099
+  frequencyFilters:
+  - Enabled: 1
+    Type: 1
+    Cutoff: 174
+    Resonance: 0.707
+    Cutoff_Mod_Amount: 1
+    Resonance_Mod_Amount: 0.21
+  - Enabled: 0
+    Type: 0
+    Cutoff: 20000
+    Resonance: 0.707
+    Cutoff_Mod_Amount: 0
+    Resonance_Mod_Amount: 0
+  - Enabled: 0
+    Type: 0
+    Cutoff: 20000
+    Resonance: 1
+    Cutoff_Mod_Amount: 0
+    Resonance_Mod_Amount: 0
+  - Enabled: 1
+    Type: 0
+    Cutoff: 19195
+    Resonance: 1
+    Cutoff_Mod_Amount: 3.05
+    Resonance_Mod_Amount: 1.81
+  eqBands:
+  - Enabled: 1
+    Frequency: 390
+    Bandwidth: 1.7
+    Boost_dB: 24
+    Frequency_Mod_Amount: 22.99
+    Bandwidth_Mod_Amount: 47.36
+    Boost_Mod_Amount: 10
+  - Enabled: 1
+    Frequency: 1990
+    Bandwidth: 1.7
+    Boost_dB: 24
+    Frequency_Mod_Amount: 30.47
+    Bandwidth_Mod_Amount: 30.68
+    Boost_Mod_Amount: 10
+  - Enabled: 1
+    Frequency: 2550
+    Bandwidth: 3.2
+    Boost_dB: 24
+    Frequency_Mod_Amount: 24.52
+    Bandwidth_Mod_Amount: 22.34
+    Boost_Mod_Amount: 10
+  combFilter:
+    Enabled: 1
+    Delay_ms: 5
+    Feedback: 0.9
+    Mix: 0.107
+  lfo1:
+    Sine_Mix: 0.593
+    Square_Mix: 0.141
+    Sawtooth_Mix: 0.774
+    Triangle_Mix: 0.438
+    Ramp_Mix: 0.387
+    Wavetable_Mix: 0
+    Harmonics:
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    Frequency: 0.75
+    Amplitude: 1
+    Amplitude_Boost: 0
+    Offset: -3
+  lfo2:
+    Sine_Mix: 0.687
+    Square_Mix: 0.29
+    Sawtooth_Mix: 0.721
+    Triangle_Mix: 0.788
+    Ramp_Mix: 0.141
+    Wavetable_Mix: 0
+    Harmonics:
+    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    Frequency: 1
+    Amplitude: 1
+    Amplitude_Boost: 0
+    Offset: 0.14
+  lfoOperations:
+    Operation: 2
+    PreOp_Multiply: 1
+    PreOp_Add: 1.52
+    PostOp_Multiply: 1
+    PostOp_Add: -0.44
+  modMatrix:
+  - Enabled: 0
+    Source: 2
+    Destination: 18
+    Amount: 0.89
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  - Enabled: 1
+    Source: 0
+    Destination: 0
+    Amount: 1
+  Limiter_Threshold_dB: 0
+  Limiter_Attack_ms: 4.5
+  Limiter_Release_ms: 115
+  Output_Peak_dB: -7.2761
