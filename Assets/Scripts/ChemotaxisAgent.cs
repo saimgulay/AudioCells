@@ -382,7 +382,7 @@ public class EColiAgent : MonoBehaviour
         }
 
         float speedCost  = speedCostMultiplier  * (genome.baseRunSpeed * genome.runSpeedFactor);
-        float sensorCost = sensorCostMultiplier * (1f / genome.tumbleSensitivity);
+        float sensorCost = sensorCostMultiplier * (1f / Mathf.Max(0.001f, genome.tumbleSensitivity));
 
         float totalMetCost = genome.metabolismRate + speedCost + sensorCost;
         if (energy < genome.dormancyThreshold)
@@ -689,10 +689,12 @@ public class EColiAgent : MonoBehaviour
         var mr = child.mutationRates;
         float scale = metaRate * 0.1f;
 
+        // Existing
         mr.nutrientEfficiencyA += Random.Range(-scale, scale);
         mr.nutrientEfficiencyB += Random.Range(-scale, scale);
         mr.nutrientEfficiencyC += Random.Range(-scale, scale);
         mr.nutrientEfficiencyD += Random.Range(-scale, scale);
+
         mr.dormancyThreshold   += Random.Range(-scale, scale);
         mr.wakeUpEnergyCost    += Random.Range(-scale, scale);
         mr.toxinProductionRate += Random.Range(-scale, scale);
@@ -707,6 +709,13 @@ public class EColiAgent : MonoBehaviour
         mr.plasmidCompatibilityThreshold += Random.Range(-scale, scale);
         mr.uvResistance         += Random.Range(-scale, scale);
 
+        // NEW: let these mutation magnitudes evolve too
+        mr.optimalTemperature   += Random.Range(-scale, scale);
+        mr.optimalPH            += Random.Range(-scale, scale);
+        mr.toxinResistance      += Random.Range(-scale, scale);
+        mr.temperatureSensitivity += Random.Range(-scale, scale);
+        mr.pHSensitivity          += Random.Range(-scale, scale);
+
         child.mutationRates = mr;
     }
 
@@ -714,25 +723,52 @@ public class EColiAgent : MonoBehaviour
     {
         var mr = child.mutationRates;
 
+        // Existing mutations
         child.nutrientEfficiencyA += Random.Range(-rate*mr.nutrientEfficiencyA,   rate*mr.nutrientEfficiencyA);
         child.nutrientEfficiencyB += Random.Range(-rate*mr.nutrientEfficiencyB,   rate*mr.nutrientEfficiencyB);
         child.nutrientEfficiencyC += Random.Range(-rate*mr.nutrientEfficiencyC,   rate*mr.nutrientEfficiencyC);
         child.nutrientEfficiencyD += Random.Range(-rate*mr.nutrientEfficiencyD,   rate*mr.nutrientEfficiencyD);
-        child.runSpeedFactor      += Random.Range(-rate*mr.runSpeedFactor,       rate*mr.runSpeedFactor);
-        child.tumbleSensitivity   += Random.Range(-rate*mr.tumbleSensitivity,    rate*mr.tumbleSensitivity);
-        child.dormancyThreshold   += Random.Range(-rate*mr.dormancyThreshold,    rate*mr.dormancyThreshold);
-        child.wakeUpEnergyCost    += Random.Range(-rate*mr.wakeUpEnergyCost,     rate*mr.wakeUpEnergyCost);
-        child.toxinProductionRate += Random.Range(-rate*mr.toxinProductionRate,  rate*mr.toxinProductionRate);
-        child.toxinPotency        += Random.Range(-rate*mr.toxinPotency,         rate*mr.toxinPotency);
+        child.runSpeedFactor      += Random.Range(-rate*mr.runSpeedFactor,        rate*mr.runSpeedFactor);
+        child.tumbleSensitivity   += Random.Range(-rate*mr.tumbleSensitivity,     rate*mr.tumbleSensitivity);
+        child.dormancyThreshold   += Random.Range(-rate*mr.dormancyThreshold,     rate*mr.dormancyThreshold);
+        child.wakeUpEnergyCost    += Random.Range(-rate*mr.wakeUpEnergyCost,      rate*mr.wakeUpEnergyCost);
+        child.toxinProductionRate += Random.Range(-rate*mr.toxinProductionRate,   rate*mr.toxinProductionRate);
+        child.toxinPotency        += Random.Range(-rate*mr.toxinPotency,          rate*mr.toxinPotency);
+        child.biofilmTendency     += Random.Range(-rate*mr.biofilmTendency,       rate*mr.biofilmTendency);
 
-        child.biofilmTendency     += Random.Range(-rate*mr.biofilmTendency,      rate*mr.biofilmTendency);
-        child.biofilmTendency      = Mathf.Clamp01(child.biofilmTendency);
-        child.uvResistance        = Mathf.Clamp01(child.uvResistance);
+        // NEW: actually mutate these four + related sensitivities
+        child.optimalTemperature  += Random.Range(-rate*mr.optimalTemperature,    rate*mr.optimalTemperature);
+        child.optimalPH           += Random.Range(-rate*mr.optimalPH,             rate*mr.optimalPH);
+        child.uvResistance        += Random.Range(-rate*mr.uvResistance,          rate*mr.uvResistance);
+        child.toxinResistance     += Random.Range(-rate*mr.toxinResistance,       rate*mr.toxinResistance);
+        child.temperatureSensitivity += Random.Range(-rate*mr.temperatureSensitivity, rate*mr.temperatureSensitivity);
+        child.pHSensitivity          += Random.Range(-rate*mr.pHSensitivity,         rate*mr.pHSensitivity);
 
+        // Clamp to sensible ranges for stability
+        ClampGenomeValues(child);
+
+        // Keep efficiencies non-negative
         child.nutrientEfficiencyA = Mathf.Max(0f, child.nutrientEfficiencyA);
         child.nutrientEfficiencyB = Mathf.Max(0f, child.nutrientEfficiencyB);
         child.nutrientEfficiencyC = Mathf.Max(0f, child.nutrientEfficiencyC);
         child.nutrientEfficiencyD = Mathf.Max(0f, child.nutrientEfficiencyD);
+    }
+
+    // Centralised clamping for newly mutated or mixed genes
+    private static void ClampGenomeValues(EColiGenome g)
+    {
+        // Resistances expected in [0,1]
+        g.uvResistance     = Mathf.Clamp01(g.uvResistance);
+        g.toxinResistance  = Mathf.Clamp01(g.toxinResistance);
+        g.biofilmTendency  = Mathf.Clamp01(g.biofilmTendency);
+
+        // Sensitivities should be non-negative
+        g.temperatureSensitivity = Mathf.Max(0f, g.temperatureSensitivity);
+        g.pHSensitivity          = Mathf.Max(0f, g.pHSensitivity);
+
+        // Reasonable operating windows; adjust to your environment ranges if needed
+        g.optimalTemperature = Mathf.Clamp(g.optimalTemperature, 5f, 60f);
+        g.optimalPH          = Mathf.Clamp(g.optimalPH,          4f, 10f);
     }
 
     #endregion
@@ -770,6 +806,15 @@ public class EColiAgent : MonoBehaviour
         receiver.plasmidCompatibilityThreshold =
             (receiver.plasmidCompatibilityThreshold + donor.plasmidCompatibilityThreshold) * 0.5f;
         receiver.uvResistance        = (receiver.uvResistance        + donor.uvResistance)        * 0.5f;
+
+        // NEW: include thermal and pH optima and sensitivities in mixing
+        receiver.optimalTemperature  = (receiver.optimalTemperature  + donor.optimalTemperature)  * 0.5f;
+        receiver.optimalPH           = (receiver.optimalPH           + donor.optimalPH)           * 0.5f;
+        receiver.temperatureSensitivity = (receiver.temperatureSensitivity + donor.temperatureSensitivity) * 0.5f;
+        receiver.pHSensitivity          = (receiver.pHSensitivity          + donor.pHSensitivity)          * 0.5f;
+
+        // Keep within valid bounds after mixing
+        ClampGenomeValues(receiver);
     }
 
     #endregion

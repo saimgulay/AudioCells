@@ -150,7 +150,7 @@ public class Universe : MonoBehaviour
 
     void Update()
     {
-        // Refill logic: for each prefab group, if refill enabled and population falls below threshold * initial count, spawn a full batch
+        // Refill logic: for each prefab group, if refill enabled and population falls below threshold * initial count, spawn a full batch. This is for sustainable nutritient spawning.
         for (int i = 0; i < prefabsToSpawn.Length; i++)
         {
             var entry = prefabsToSpawn[i];

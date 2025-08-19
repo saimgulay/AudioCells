@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// IMGUI-based experiment menu controlled by the currently signed-in user.
 /// - Reads username from UserData.json (Assets/Data or persistentDataPath) or PlayerPrefs("LastUsername").
-/// - Shows buttons for configured scenes: Tutorial, Sonification J/K/L/M, and "Quit Experiment".
+/// - Shows buttons for configured scenes: Tutorial, Sonification J/K/L/M/N, and "Quit Experiment".
 /// - Disables scene buttons when no username is present; displays a helpful notice instead.
 /// - Verifies scene availability in Build Settings before loading; shows an inline message if missing.
 /// - British English comments & UI text; layout style matching your prior IMGUI windows.
@@ -15,11 +15,12 @@ using UnityEngine.SceneManagement;
 public class ExperimentMenu : MonoBehaviour
 {
     [Header("Scenes (must be in File ▶ Build Settings…)")]
-    public string tutorialSceneName      = "Tutorial";
-    public string sonificationJSceneName = "Sonification_J";
-    public string sonificationKSceneName = "Sonification_K";
-    public string sonificationLSceneName = "Sonification_L";
-    public string sonificationMSceneName = "Sonification_M";
+    public string tutorialSceneName       = "Tutorial";
+    public string sonificationJSceneName  = "Sonification_J";
+    public string sonificationKSceneName  = "Sonification_K";
+    public string sonificationLSceneName  = "Sonification_L";
+    public string sonificationMSceneName  = "Sonification_M";
+    public string sonificationNSceneName  = "Sonification_N"; // NEW
 
     [Header("UI Window")]
     public bool showWindow = true;                 // Toggle if you like (e.g., with a key)
@@ -58,7 +59,7 @@ public class ExperimentMenu : MonoBehaviour
 
     void Update()
     {
-        // örn. M tuşu ile gizle/göster (istersen değiştir)
+        // Example toggle key for showing/hiding the menu (feel free to change)
         if (Input.GetKeyDown(KeyCode.M))
             showWindow = !showWindow;
     }
@@ -73,7 +74,7 @@ public class ExperimentMenu : MonoBehaviour
 
     private void DrawWindow(int id)
     {
-        // Küçük bir dikey scroll alanı (uzarsa taşmasın)
+        // Scroll area so long content doesn’t overflow
         _scroll = GUILayout.BeginScrollView(_scroll);
 
         GUILayout.Label($"Current user: {(string.IsNullOrEmpty(_username) ? "<none>" : _username)}");
@@ -95,7 +96,7 @@ public class ExperimentMenu : MonoBehaviour
             GUILayout.Space(6);
         }
 
-        // Butonları toplu halde devre dışı bırak (kullanıcı yokken)
+        // Disable scene buttons when there is no username
         bool canEnter = !string.IsNullOrEmpty(_username);
         GUI.enabled = canEnter;
 
@@ -114,11 +115,14 @@ public class ExperimentMenu : MonoBehaviour
         // 6) Sonification M
         DrawSceneButton("6) Sonification M", sonificationMSceneName);
 
+        // 7) Sonification N (NEW)
+        DrawSceneButton("7) Sonification N", sonificationNSceneName);
+
         GUI.enabled = true;
 
         GUILayout.Space(10);
-        // 7) Quit Experiment
-        if (GUILayout.Button("7) Quit Experiment", GUILayout.Height(28)))
+        // 8) Quit Experiment (renumbered)
+        if (GUILayout.Button("8) Quit Experiment", GUILayout.Height(28)))
         {
             QuitExperiment();
         }
@@ -194,7 +198,7 @@ public class ExperimentMenu : MonoBehaviour
     private void QuitExperiment()
     {
 #if UNITY_EDITOR
-        // Editor'de Play modunu bırak
+        // In the Editor, exit Play mode
         UnityEditor.EditorApplication.isPlaying = false;
 #else
         Application.Quit();
@@ -205,7 +209,7 @@ public class ExperimentMenu : MonoBehaviour
 
     private void ResolveCurrentUser()
     {
-        // 1) PlayerPrefs (en güvenilir, en son sahnenin bıraktığı)
+        // 1) PlayerPrefs (most recent, set by your user entry scene)
         try
         {
             if (PlayerPrefs.HasKey("LastUsername"))
@@ -214,7 +218,7 @@ public class ExperimentMenu : MonoBehaviour
                 if (!string.IsNullOrWhiteSpace(pp))
                 {
                     _username = pp.Trim();
-                    // Bilgi satırı için dosyadan tarihleri de deneriz
+                    // Try to populate created/updated timestamps from file
                     TryPopulateUserTimestamps(_username);
                     return;
                 }
@@ -222,7 +226,7 @@ public class ExperimentMenu : MonoBehaviour
         }
         catch { }
 
-        // 2) UserData.json (son kayıt)
+        // 2) UserData.json (last entry)
         try
         {
             var last = TryGetLastUserFromFile();
@@ -307,7 +311,7 @@ public class ExperimentMenu : MonoBehaviour
         }
         catch { }
 
-        // Unknown/corrupt → backup and return empty
+        // Unknown/corrupt → back up and return empty
         try { File.WriteAllText(path + ".bak_" + DateTime.UtcNow.ToString("yyyyMMddHHmmss"), text); } catch { }
         return new UserDataContainer();
     }

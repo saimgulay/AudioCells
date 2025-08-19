@@ -12,7 +12,7 @@ public class EColiGenome : ScriptableObject
     public float temperatureSensitivity = 0.1f;
     public float optimalPH = 7f;
     public float pHSensitivity = 0.1f;
-    public float toxinResistance = 0.1f;
+    [Range(0f, 1f)] public float toxinResistance = 0.1f;
     [Range(0f, 1f)] public float uvResistance = 0.05f;
 
     [Header("Feeding Efficiency")]

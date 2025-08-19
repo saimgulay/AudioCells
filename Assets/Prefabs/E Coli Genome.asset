@@ -47,34 +47,34 @@ MonoBehaviour:
   generalMutationRate: 0.03
   lethalMutationRate: 0.005
   mutationRates:
-    runSpeedFactor: 1
-    tumbleSensitivity: 0.01
-    metabolismRate: 0.01
-    reproductionThreshold: 0.005
-    optimalTemperature: 10
-    temperatureSensitivity: 0.05
-    optimalPH: 10
-    pHSensitivity: 0.05
-    toxinResistance: 10
-    uvResistance: 10
+    runSpeedFactor: 5
+    tumbleSensitivity: 0.05
+    metabolismRate: 0.05
+    reproductionThreshold: 0.01
+    optimalTemperature: 4
+    temperatureSensitivity: 0.005
+    optimalPH: 4
+    pHSensitivity: 0.005
+    toxinResistance: 4
+    uvResistance: 4
     nutrientEfficiencyA: 0.1
-    nutrientEfficiencyB: 0.1
-    nutrientEfficiencyC: 0.1
-    nutrientEfficiencyD: 0.1
-    chemotaxisMemoryLength: 0.4
+    nutrientEfficiencyB: 0
+    nutrientEfficiencyC: 0
+    nutrientEfficiencyD: 0
+    chemotaxisMemoryLength: 4
     baseTumbleRate: 0.4
     tumbleSlopeSensitivity: 0.01
     tumbleAngleRange: 0.01
-    explorationTendency: 0.01
+    explorationTendency: 0.35
     gradientTolerance: 0.01
     decisionNoise: 0.075
-    temperaturePlasticity: 0.01
-    pHPlasticity: 0.01
-    starvationTolerance: 0.01
+    temperaturePlasticity: 0.005
+    pHPlasticity: 0.005
+    starvationTolerance: 1
     deathDelayBias: 0.01
     restBehavior: 0.01
-    nutrientDiscrimination: 0.01
-    deadCellPreference: 0.132
+    nutrientDiscrimination: 0
+    deadCellPreference: 0.349
     conjugationAggressiveness: 0.08
     geneticStability: 0.256
     baseRunSpeed: 0.15

@@ -1,6 +1,6 @@
 // Assets/Scripts/PythonStreamerRunner.cs
 // Launch/stop Python streamer from inside Unity.
-// L = start/stop, K = show/hide window, Esc = End Scene (flush EEG JSON if present + go to Menu).
+// L = start/stop, K = show/hide window, Esc = Stop EEG recording (no scene change).
 // Sends UDP {"cmd":"shutdown"} to Python for graceful release before Kill().
 // Movable window + scroll, robust path resolution.
 // British English comments and logs.
@@ -11,7 +11,6 @@ using System.Net.Sockets;
 using System.Text;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Diag = System.Diagnostics;
 
 public class PythonStreamerRunner : MonoBehaviour
@@ -40,12 +39,6 @@ public class PythonStreamerRunner : MonoBehaviour
     public Vector2 windowPosition = new Vector2(10, 200);
     public Vector2 windowSize = new Vector2(640, 360);
     public float logHeight = 160f;
-
-    [Header("Scene Ending")]
-    [Tooltip("Scene to load when 'End Scene' is pressed (or Esc).")]
-    public string menuSceneName = "Menu";
-    [Tooltip("Attempt to flush EEG JSON (EEGMetricsUdpReceiver) before leaving the scene.")]
-    public bool flushEegBeforeEndScene = true;
 
     private Diag.Process _proc;
     private StringBuilder _lastLines = new StringBuilder(4096);
@@ -83,9 +76,10 @@ public class PythonStreamerRunner : MonoBehaviour
         {
             showWindow = !showWindow;
         }
+        // Esc now ONLY stops EEG recording; it does NOT change scene.
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            EndScene();
+            StopEegRecordingOnly();
         }
     }
 
@@ -275,7 +269,7 @@ public class PythonStreamerRunner : MonoBehaviour
 
     private void DrawWindow(int id)
     {
-        GUILayout.Label("L = start/stop   |   K = show/hide   |   Esc = End Scene");
+        GUILayout.Label("L = start/stop   |   K = show/hide   |   Esc = Stop EEG recording");
         GUILayout.Label("Entered path: " + (string.IsNullOrEmpty(pythonScriptPath) ? "(empty → auto)" : pythonScriptPath));
         GUILayout.Label("Resolved: " + _resolvedPath);
         GUILayout.Label($"Conda: {(useConda ? $"{condaEnvName} via {condaShPath}" : "Disabled (system python)")}");
@@ -316,10 +310,9 @@ public class PythonStreamerRunner : MonoBehaviour
             }
         }
 
-        GUILayout.FlexibleSpace();
-        if (GUILayout.Button("End Scene (Esc)", GUILayout.Width(160)))
+        if (GUILayout.Button("Stop Recording (Esc)", GUILayout.Width(160)))
         {
-            EndScene();
+            StopEegRecordingOnly();
         }
         GUILayout.EndHorizontal();
 
@@ -335,49 +328,10 @@ public class PythonStreamerRunner : MonoBehaviour
 
     void OnDestroy() => StopPython();
 
-    // ---- End Scene (flush EEG JSON if present, then go to Menu) --------------
+    // ---- Stop EEG recording ONLY (Esc) --------------------------------------
 
-    [ContextMenu("End Scene")]
-    public void EndScene()
-    {
-        if (flushEegBeforeEndScene)
-            TryFlushEegSessions();
-
-        if (string.IsNullOrEmpty(menuSceneName))
-        {
-            Debug.LogWarning("[PythonRunner] End Scene requested but menuSceneName is empty.");
-            return;
-        }
-
-        if (!CanLoadSceneByName(menuSceneName))
-        {
-            Debug.LogWarning($"[PythonRunner] Scene '{menuSceneName}' is not in Build Settings.");
-            return;
-        }
-
-        try
-        {
-            SceneManager.LoadScene(menuSceneName);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"[PythonRunner] Failed to load scene '{menuSceneName}': {ex.Message}");
-        }
-    }
-
-    private bool CanLoadSceneByName(string sceneName)
-    {
-        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
-        {
-            var path = SceneUtility.GetScenePathByBuildIndex(i);
-            var name = Path.GetFileNameWithoutExtension(path);
-            if (string.Equals(name, sceneName, StringComparison.OrdinalIgnoreCase))
-                return true;
-        }
-        return false;
-    }
-
-    private void TryFlushEegSessions()
+    [ContextMenu("Stop EEG Recording Only")]
+    public void StopEegRecordingOnly()
     {
         try
         {
@@ -388,31 +342,54 @@ public class PythonStreamerRunner : MonoBehaviour
                 var t = mb.GetType();
                 if (t.Name != "EEGMetricsUdpReceiver") continue;
 
-                // Turn off recording if present
+                bool stopped = false;
+
+                // 1) recording field (bool)
                 var recField = t.GetField("recording", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                if (recField != null) { try { recField.SetValue(mb, false); } catch { } }
-
-                // Call FlushNow() if available; else try FlushPendingToDisk via reflection.
-                var m =
-                    t.GetMethod("FlushNow", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) ??
-                    t.GetMethod("FlushPendingToDisk", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-                if (m != null)
+                if (recField != null && recField.FieldType == typeof(bool))
                 {
-                    m.Invoke(mb, null);
-                    Debug.Log("[PythonRunner] EEG JSON flushed before leaving scene.");
+                    try { recField.SetValue(mb, false); stopped = true; } catch { }
                 }
+
+                // 2) recording property (bool)
+                if (!stopped)
+                {
+                    var recProp = t.GetProperty("recording", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (recProp != null && recProp.CanWrite && recProp.PropertyType == typeof(bool))
+                    {
+                        try { recProp.SetValue(mb, false); stopped = true; } catch { }
+                    }
+                }
+
+                // 3) SetRecording(false) / StopRecording() fallbacks
+                if (!stopped)
+                {
+                    var setRec = t.GetMethod("SetRecording", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(bool) }, null);
+                    if (setRec != null)
+                    {
+                        try { setRec.Invoke(mb, new object[] { false }); stopped = true; } catch { }
+                    }
+                }
+                if (!stopped)
+                {
+                    var stopRec = t.GetMethod("StopRecording", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (stopRec != null)
+                    {
+                        try { stopRec.Invoke(mb, null); stopped = true; } catch { }
+                    }
+                }
+
+                if (stopped)
+                    Debug.Log("[PythonRunner] EEG recording stopped (Esc).");
                 else
-                {
-                    mb.gameObject.SendMessage("FlushNow", SendMessageOptions.DontRequireReceiver);
-                    mb.gameObject.SendMessage("FlushPendingToDisk", SendMessageOptions.DontRequireReceiver);
-                }
+                    Debug.LogWarning("[PythonRunner] Could not stop EEG recording: no compatible API found.");
+
                 break; // assume single receiver
             }
         }
         catch (Exception ex)
         {
-            Debug.LogWarning("[PythonRunner] EEG flush attempt failed: " + ex.Message);
+            Debug.LogWarning("[PythonRunner] EEG stop attempt failed: " + ex.Message);
         }
     }
 

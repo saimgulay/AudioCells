@@ -17,6 +17,7 @@ public class RestingLoby : MonoBehaviour
     public string sonificationKSceneName = "Sonification_K";
     public string sonificationLSceneName = "Sonification_L";
     public string sonificationMSceneName = "Sonification_M";
+    public string sonificationNSceneName = "Sonification_N"; // NEW
 
     [Header("Timer")]
     [Tooltip("Rest period length in minutes before the next scene starts automatically.")]
@@ -128,6 +129,7 @@ public class RestingLoby : MonoBehaviour
         DrawSelectRow("4) Sonification K",  sonificationKSceneName);
         DrawSelectRow("5) Sonification L",  sonificationLSceneName);
         DrawSelectRow("6) Sonification M",  sonificationMSceneName);
+        DrawSelectRow("7) Sonification N",  sonificationNSceneName); // NEW
 
         GUI.enabled = true;
 
@@ -136,8 +138,8 @@ public class RestingLoby : MonoBehaviour
         GUILayout.Label($"Current selection: <b>{(string.IsNullOrEmpty(_selectedScene) ? "— none —" : _selectedScene)}</b>");
 
         GUILayout.Space(12);
-        // 7) Quit Experiment (allowed anytime)
-        if (GUILayout.Button("7) Quit Experiment", GUILayout.Height(28)))
+        // 8) Quit Experiment (renumbered)
+        if (GUILayout.Button("8) Quit Experiment", GUILayout.Height(28)))
             QuitExperiment();
 
         GUILayout.EndScrollView();

@@ -4,6 +4,10 @@ using System.Collections;
 [RequireComponent(typeof(Synth))]
 public class SynthNoteLooper : MonoBehaviour
 {
+    [Header("Bypass")]
+    [Tooltip("Tick to bypass the looper. When enabled, envelope and note playback are skipped and amplitude is forced to 0.")]
+    public bool bypass = false;
+
     [Header("ADSR Envelope (seconds)")]
     [Tooltip("Time taken for the attack phase.")]
     public float attackTime = 0.1f;
@@ -26,6 +30,7 @@ public class SynthNoteLooper : MonoBehaviour
 
     private Synth synth;
     private OscillatorSettings osc1;
+    private Coroutine loopRoutine;
 
     void Awake()
     {
@@ -34,57 +39,131 @@ public class SynthNoteLooper : MonoBehaviour
         osc1 = synth.oscillator1;
     }
 
-    void Start()
+    void OnEnable()
     {
-        // Begin the looping coroutine
-        StartCoroutine(NoteLoop());
+        TryStartLoop();
+    }
+
+    void OnDisable()
+    {
+        StopLoopImmediate();
+    }
+
+    void Update()
+    {
+        // Live toggling support
+        if (bypass)
+        {
+            if (loopRoutine != null)
+                StopLoopImmediate(); // ensure envelope stops and amplitude is zeroed
+        }
+        else
+        {
+            if (loopRoutine == null)
+                TryStartLoop(); // resume when un-bypassed
+        }
+    }
+
+    private void TryStartLoop()
+    {
+        if (bypass) { ForceSilence(); return; }
+        if (loopRoutine == null)
+            loopRoutine = StartCoroutine(NoteLoop());
+    }
+
+    private void StopLoopImmediate()
+    {
+        if (loopRoutine != null)
+        {
+            StopCoroutine(loopRoutine);
+            loopRoutine = null;
+        }
+        ForceSilence();
+    }
+
+    private void ForceSilence()
+    {
+        if (osc1 != null)
+            osc1.Amplitude = 0f;
     }
 
     private IEnumerator NoteLoop()
     {
         while (true)
         {
+            // If bypass turned on mid-loop, exit gracefully
+            if (bypass) yield break;
+
             yield return StartCoroutine(PlayOneNote());
-            yield return new WaitForSeconds(waitTime);
+
+            if (bypass) yield break;
+
+            if (waitTime > 0f)
+                yield return new WaitForSeconds(waitTime);
+            else
+                yield return null;
         }
     }
 
     private IEnumerator PlayOneNote()
     {
+        // Early out if bypassed
+        if (bypass) yield break;
+
         float elapsed = 0f;
 
         // Attack: ramp amplitude from 0 to 1
-        while (elapsed < attackTime)
+        if (attackTime > 0f)
         {
-            osc1.Amplitude = Mathf.Lerp(0f, 1f, elapsed / attackTime);
-            elapsed += Time.deltaTime;
-            yield return null;
+            while (elapsed < attackTime)
+            {
+                if (bypass) yield break;
+                osc1.Amplitude = Mathf.Lerp(0f, 1f, elapsed / attackTime);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
         }
         osc1.Amplitude = 1f;
 
         // Decay: ramp amplitude from 1 to sustainLevel
         elapsed = 0f;
-        while (elapsed < decayTime)
+        if (decayTime > 0f)
         {
-            osc1.Amplitude = Mathf.Lerp(1f, sustainLevel, elapsed / decayTime);
-            elapsed += Time.deltaTime;
-            yield return null;
+            while (elapsed < decayTime)
+            {
+                if (bypass) yield break;
+                osc1.Amplitude = Mathf.Lerp(1f, sustainLevel, elapsed / decayTime);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
         }
         osc1.Amplitude = sustainLevel;
 
         // Sustain: hold level for the remainder of noteDuration
         float sustainTime = noteDuration - (attackTime + decayTime + releaseTime);
         if (sustainTime > 0f)
-            yield return new WaitForSeconds(sustainTime);
+        {
+            float t = 0f;
+            while (t < sustainTime)
+            {
+                if (bypass) yield break;
+                t += Time.deltaTime;
+                yield return null;
+            }
+        }
 
         // Release: ramp amplitude from sustainLevel to 0
         elapsed = 0f;
-        float startLevel = osc1.Amplitude;
-        while (elapsed < releaseTime)
+        if (releaseTime > 0f)
         {
-            osc1.Amplitude = Mathf.Lerp(startLevel, 0f, elapsed / releaseTime);
-            elapsed += Time.deltaTime;
-            yield return null;
+            float startLevel = osc1.Amplitude;
+            while (elapsed < releaseTime)
+            {
+                if (bypass) yield break;
+                osc1.Amplitude = Mathf.Lerp(startLevel, 0f, elapsed / releaseTime);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
         }
         osc1.Amplitude = 0f;
     }

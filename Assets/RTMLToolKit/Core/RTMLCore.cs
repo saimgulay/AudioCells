@@ -48,7 +48,7 @@ namespace RTMLToolKit
     {
         public int inputSize;
         public int outputSize;
-        public float similarityThreshold; // EKLENDI: Eşleşme eşiği
+        public float similarityThreshold; // EKLENDİ: Eşleşme eşiği
         public List<List<float>> templates;
         public List<List<float>> templateOutputs;
     }
@@ -72,7 +72,7 @@ namespace RTMLToolKit
         [Tooltip("Type of model to use: LinearRegression, KNN, or DTW.")]
         public ModelType modelType = ModelType.LinearRegression;
 
-        [Header("DTW Settings")] // EKLENDI: DTW’ye özel ayarlar bölümü
+        [Header("DTW Settings")] // EKLENDİ: DTW’ye özel ayarlar bölümü
         [Tooltip("Similarity threshold for DTW matching. A lower distance means a better match. If the best match distance is above this threshold, it is rejected. Higher values make matching easier.")]
         public float dtwSimilarityThreshold = 100.0f;
 
@@ -113,12 +113,24 @@ namespace RTMLToolKit
         [Tooltip("If enabled, the model specified in 'modelFileName' will be loaded and set to run on Start.")]
         public bool loadAndRunOnStart = false;
 
+        [Header("Performance")]
+        [Tooltip("If enabled, recording/prediction will only run when the input vector changes beyond the epsilon threshold. Useful to skip identical frames.")]
+        public bool onlyProcessOnInputChange = false;
+
+        [Tooltip("Two inputs are considered the same if every element differs by less than this absolute value.")]
+        public float inputChangeEpsilon = 1e-4f;
+
         //--------------- Internal References ---------------//
 
         private SampleBuffer sampleBuffer;
         internal IModel model;
         private OSCReceiver oscReceiver;
         private OSCSender oscSender;
+
+        // Change-detection cache
+        private float[] _lastInput;          // last processed input
+        private float[] _lastPrediction;     // cached prediction for last processed input
+        private bool _hasLastInput = false;
 
         //--------------- Unity Lifecycle ---------------//
 
@@ -129,6 +141,11 @@ namespace RTMLToolKit
 
             if (useOsc)
                 SetUpOsc();
+
+            // reset caches
+            _lastInput = null;
+            _lastPrediction = null;
+            _hasLastInput = false;
         }
 
         void Start()
@@ -154,8 +171,8 @@ namespace RTMLToolKit
         {
             if (useOsc)
             {
-                oscReceiver.Close();
-                oscSender.Close();
+                if (oscReceiver != null) oscReceiver.Close();
+                if (oscSender   != null) oscSender.Close();
             }
         }
 
@@ -390,7 +407,12 @@ namespace RTMLToolKit
         public void RecordSample(float[] input, float[] output)
         {
             if (!enableRecord) return;
+
+            if (onlyProcessOnInputChange && !HasMeaningfulChange(input))
+                return;
+
             sampleBuffer.AddSample(input, output);
+            UpdateLastInput(input);
         }
 
         public void TrainModel()
@@ -407,7 +429,22 @@ namespace RTMLToolKit
         public float[] PredictSample(float[] input)
         {
             if (!enableRun) return new float[outputSize];
-            return model.Predict(input);
+
+            if (onlyProcessOnInputChange && !HasMeaningfulChange(input) && _lastPrediction != null && _lastPrediction.Length == outputSize)
+            {
+                // Return cached prediction without recomputing
+                return (float[])_lastPrediction.Clone();
+            }
+
+            var pred = model.Predict(input);
+
+            if (onlyProcessOnInputChange)
+            {
+                CachePrediction(pred);
+                UpdateLastInput(input);
+            }
+
+            return pred;
         }
 
         //--------------- Internal Data Handler ---------------//
@@ -415,12 +452,24 @@ namespace RTMLToolKit
         private void DirectOnData(float[] data)
         {
             if (data.Length != inputSize) return;
-            if (enableRecord) sampleBuffer.AddSample(data, new float[outputSize]);
+
+            // Skip processing when input hasn't changed (if enabled)
+            if (onlyProcessOnInputChange && !HasMeaningfulChange(data))
+                return;
+
+            if (enableRecord)
+                sampleBuffer.AddSample(data, new float[outputSize]);
+
             if (enableRun)
             {
                 var pred = model.Predict(data);
-                oscSender.Send(oscOutputAddress, pred);
+                if (onlyProcessOnInputChange) CachePrediction(pred);
+
+                if (useOsc && oscSender != null)
+                    oscSender.Send(oscOutputAddress, pred);
             }
+
+            UpdateLastInput(data);
         }
 
         //--------------- Sample Deletion Methods ---------------//
@@ -447,6 +496,38 @@ namespace RTMLToolKit
         {
             sampleBuffer.Clear();
             Logger.Log("[RTMLCore] All recorded samples deleted.");
+        }
+
+        //--------------- Change Detection Helpers ---------------//
+
+        private bool HasMeaningfulChange(float[] current)
+        {
+            if (!_hasLastInput || _lastInput == null || _lastInput.Length != current.Length)
+                return true;
+
+            // Absolute element-wise comparison
+            for (int i = 0; i < current.Length; i++)
+            {
+                if (Mathf.Abs(current[i] - _lastInput[i]) > inputChangeEpsilon)
+                    return true;
+            }
+            return false;
+        }
+
+        private void UpdateLastInput(float[] data)
+        {
+            if (_lastInput == null || _lastInput.Length != data.Length)
+                _lastInput = new float[data.Length];
+            Array.Copy(data, _lastInput, data.Length);
+            _hasLastInput = true;
+        }
+
+        private void CachePrediction(float[] pred)
+        {
+            if (pred == null) { _lastPrediction = null; return; }
+            if (_lastPrediction == null || _lastPrediction.Length != pred.Length)
+                _lastPrediction = new float[pred.Length];
+            Array.Copy(pred, _lastPrediction, pred.Length);
         }
     }
 

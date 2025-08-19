@@ -278,8 +278,6 @@ MonoBehaviour:
   windowPosition: {x: 500, y: 250}
   windowSize: {x: 640, y: 320}
   logHeight: 160
-  menuSceneName: Menu
-  flushEegBeforeEndScene: 1
 --- !u!4 &41299156
 Transform:
   m_ObjectHideFlags: 0
@@ -2273,14 +2271,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e855a9cb0ae6474b9e41abc39e8c363, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxDurationMinutes: 7
-  autoRedirectDelay: 2
+  maxDurationMinutes: 2
+  postSurveyRedirectDelay: 2
   redirectSceneName: RestingLoby
   disableWhenAlreadyInTarget: 1
+  enableSurvey: 0
   showWindow: 0
   windowPosition: {x: 500, y: 250}
-  windowSize: {x: 520, y: 150}
-  allowDrag: 0
+  windowSize: {x: 1100, y: 760}
+  allowDrag: 1
+  escTriggerDelay: 0.1
+  overrideUsername: 
+  dataFolderName: Data
+  userFileName: UserData.json
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
