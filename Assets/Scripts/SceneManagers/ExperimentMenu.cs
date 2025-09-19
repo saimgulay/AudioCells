@@ -11,6 +11,14 @@ using UnityEngine.SceneManagement;
 /// - Disables scene buttons when no username is present; displays a helpful notice instead.
 /// - Verifies scene availability in Build Settings before loading; shows an inline message if missing.
 /// - British English comments & UI text; layout style matching your prior IMGUI windows.
+///
+/// NEW (v2):
+/// - Intercepts "Quit Experiment" and shows a modal prompt (English) asking:
+///     "Before we close: if you were to use one of these sonification styles in your own project,
+///      which scene would you pick?"
+///   Options are derived from the configured Sonification scenes (J/K/L/M/N) that have non-empty names.
+/// - On "Confirm & Quit", appends a preference record to the *same* UserData.json under `preferences`.
+///   (Structure is backward-compatible; older files without `preferences` remain valid.)
 /// </summary>
 public class ExperimentMenu : MonoBehaviour
 {
@@ -43,9 +51,53 @@ public class ExperimentMenu : MonoBehaviour
     private string _message = "";       // inline info/warnings (e.g., scene missing)
 
     // --- JSON models for reading last user ---
-    [Serializable] private class UserDataEntry { public string username; public string createdAtIso; public string updatedAtIso; public int version = 1; }
-    [Serializable] private class UserDataContainer { public List<UserDataEntry> entries = new List<UserDataEntry>(); }
-    [Serializable] private class LegacyUserDataModel { public string username; public string createdAtIso; public string updatedAtIso; public int version; }
+    [Serializable] private class UserDataEntry
+    {
+        public string username;
+        public string createdAtIso;
+        public string updatedAtIso;
+        public int version = 1;
+    }
+
+    /// <summary>
+    /// NEW: preference records appended when the user confirms a sonification choice at quit time.
+    /// </summary>
+    [Serializable] private class UserPreferenceEntry
+    {
+        public string username;          // may be "(none)" if no username was set
+        public string choiceLabel;       // e.g., "Sonification J"
+        public string sceneName;         // e.g., "Sonification_J"
+        public string recordedAtIso;     // ISO 8601 (UTC)
+        public string source = "quit_experiment_prompt";
+        public int version = 1;
+    }
+
+    [Serializable] private class UserDataContainer
+    {
+        public List<UserDataEntry> entries = new List<UserDataEntry>();
+
+        // NEW (optional; absent in legacy files):
+        public List<UserPreferenceEntry> preferences = new List<UserPreferenceEntry>();
+    }
+
+    [Serializable] private class LegacyUserDataModel
+    {
+        public string username;
+        public string createdAtIso;
+        public string updatedAtIso;
+        public int version;
+    }
+
+    // --- Quit prompt state ---
+    private bool _showQuitPrompt = false;
+    private int _quitSelectedIndex = -1;
+
+    private struct SonificationOption
+    {
+        public string label;     // "Sonification J"
+        public string sceneName; // "Sonification_J"
+    }
+    private List<SonificationOption> _quitOptions = new List<SonificationOption>();
 
     void Awake()
     {
@@ -67,9 +119,19 @@ public class ExperimentMenu : MonoBehaviour
     void OnGUI()
     {
         if (!showWindow) return;
+
+        // Allow <b>, <i>, <color> tags in labels (Unity rich text uses American spelling internally).
+        var prevRich = GUI.skin.label.richText;
+        GUI.skin.label.richText = true;
+
         _windowRect = GUILayout.Window(GetInstanceID(), _windowRect, DrawWindow, "Experiment Menu");
         windowPosition = new Vector2(_windowRect.x, _windowRect.y);
         windowSize     = new Vector2(_windowRect.width, _windowRect.height);
+
+        if (_showQuitPrompt)
+            DrawQuitPromptModal();
+
+        GUI.skin.label.richText = prevRich;
     }
 
     private void DrawWindow(int id)
@@ -124,7 +186,7 @@ public class ExperimentMenu : MonoBehaviour
         // 8) Quit Experiment (renumbered)
         if (GUILayout.Button("8) Quit Experiment", GUILayout.Height(28)))
         {
-            QuitExperiment();
+            BeginQuitFlow();
         }
 
         GUILayout.EndScrollView();
@@ -195,14 +257,137 @@ public class ExperimentMenu : MonoBehaviour
         return false;
     }
 
-    private void QuitExperiment()
+    // =========================
+    // Quit flow (modal prompt)
+    // =========================
+
+    private void BeginQuitFlow()
     {
+        // Build options list from configured sonification scenes that have non-empty names.
+        _quitOptions.Clear();
+        AddOptionIfValid("Sonification J", sonificationJSceneName);
+        AddOptionIfValid("Sonification K", sonificationKSceneName);
+        AddOptionIfValid("Sonification L", sonificationLSceneName);
+        AddOptionIfValid("Sonification M", sonificationMSceneName);
+        AddOptionIfValid("Sonification N", sonificationNSceneName);
+
+        _quitSelectedIndex = -1;
+        _showQuitPrompt = true;
+    }
+
+    private void AddOptionIfValid(string label, string sceneName)
+    {
+        if (!string.IsNullOrWhiteSpace(sceneName))
+        {
+            _quitOptions.Add(new SonificationOption { label = label, sceneName = sceneName });
+        }
+    }
+
+    private void DrawQuitPromptModal()
+    {
+        // Darken background a touch (simple overlay)
+        var overlay = new Rect(0, 0, Screen.width, Screen.height);
+        GUI.Box(overlay, GUIContent.none); // minimal blocker
+
+        // Centre the modal window
+        float w = 640f, h = 360f;
+        var rect = new Rect((Screen.width - w) * 0.5f, (Screen.height - h) * 0.5f, w, h);
+        GUILayout.Window(GetInstanceID() ^ 0x5A5A, rect, DrawQuitPromptContents, "Before we close…");
+    }
+
+    private void DrawQuitPromptContents(int id)
+    {
+        GUILayout.Label(
+            "Before we close: if you were to use one of these sonification styles in your own project,\n" +
+            "which scene would you pick? Please choose one.");
+
+        GUILayout.Space(6);
+
+        if (_quitOptions.Count == 0)
+        {
+            GUILayout.Label("No sonification scenes are configured. You may proceed to quit.");
+        }
+        else
+        {
+            // Radio-like exclusive toggles
+            for (int i = 0; i < _quitOptions.Count; i++)
+            {
+                bool selected = (_quitSelectedIndex == i);
+                bool now = GUILayout.Toggle(selected, $"{_quitOptions[i].label} — scene “{_quitOptions[i].sceneName}”");
+                if (now && !selected) _quitSelectedIndex = i;
+            }
+        }
+
+        GUILayout.FlexibleSpace();
+
+        using (new GUILayout.HorizontalScope())
+        {
+            // Cancel (return to menu)
+            if (GUILayout.Button("Cancel", GUILayout.Height(26), GUILayout.Width(120)))
+            {
+                _showQuitPrompt = false;
+            }
+
+            GUILayout.FlexibleSpace();
+
+            // Skip & Quit (do not record)
+            if (GUILayout.Button("Skip & Quit", GUILayout.Height(26), GUILayout.Width(140)))
+            {
+                FinaliseQuit(recordChoice: false);
+            }
+
+            // Confirm & Quit (record)
+            GUI.enabled = (_quitSelectedIndex >= 0 && _quitOptions.Count > 0);
+            if (GUILayout.Button("Confirm & Quit", GUILayout.Height(28), GUILayout.Width(160)))
+            {
+                FinaliseQuit(recordChoice: true);
+            }
+            GUI.enabled = true;
+        }
+    }
+
+    private void FinaliseQuit(bool recordChoice)
+    {
+        if (recordChoice && _quitSelectedIndex >= 0 && _quitSelectedIndex < _quitOptions.Count)
+        {
+            var opt = _quitOptions[_quitSelectedIndex];
+            string uname = string.IsNullOrWhiteSpace(_username) ? "(none)" : _username;
+            TryAppendPreference(uname, opt.label, opt.sceneName);
+        }
+
+        // Proceed to actually quit
 #if UNITY_EDITOR
-        // In the Editor, exit Play mode
         UnityEditor.EditorApplication.isPlaying = false;
 #else
         Application.Quit();
 #endif
+    }
+
+    private void TryAppendPreference(string username, string choiceLabel, string sceneName)
+    {
+        try
+        {
+            var container = LoadContainerWithMigration();
+            if (container.preferences == null)
+                container.preferences = new List<UserPreferenceEntry>();
+
+            container.preferences.Add(new UserPreferenceEntry
+            {
+                username      = username,
+                choiceLabel   = choiceLabel,
+                sceneName     = sceneName,
+                recordedAtIso = DateTime.UtcNow.ToString("o"),
+                source        = "quit_experiment_prompt",
+                version       = 1
+            });
+
+            SaveContainer(container);
+        }
+        catch (Exception ex)
+        {
+            // Non-fatal: carry on quitting even if we fail to write
+            Debug.LogWarning($"ExperimentMenu: failed to append preference to JSON: {ex.Message}");
+        }
     }
 
     // --- user resolution (matches your UserData.cs writing format) ---
@@ -284,7 +469,7 @@ public class ExperimentMenu : MonoBehaviour
         string text = File.ReadAllText(path);
         if (string.IsNullOrWhiteSpace(text)) return new UserDataContainer();
 
-        // Modern list container
+        // Modern list container (may or may not include 'preferences')
         try
         {
             var c = JsonUtility.FromJson<UserDataContainer>(text);
@@ -292,7 +477,7 @@ public class ExperimentMenu : MonoBehaviour
         }
         catch { }
 
-        // Legacy single object
+        // Legacy single object -> migrate into list container
         try
         {
             var legacy = JsonUtility.FromJson<LegacyUserDataModel>(text);
@@ -306,6 +491,7 @@ public class ExperimentMenu : MonoBehaviour
                     updatedAtIso = string.IsNullOrEmpty(legacy.updatedAtIso) ? legacy.createdAtIso : legacy.updatedAtIso,
                     version = legacy.version <= 0 ? 1 : legacy.version
                 });
+                // preferences remains empty on migration (none recorded in legacy files)
                 return migrated;
             }
         }
@@ -314,6 +500,28 @@ public class ExperimentMenu : MonoBehaviour
         // Unknown/corrupt → back up and return empty
         try { File.WriteAllText(path + ".bak_" + DateTime.UtcNow.ToString("yyyyMMddHHmmss"), text); } catch { }
         return new UserDataContainer();
+    }
+
+    private void SaveContainer(UserDataContainer container)
+    {
+        string path = GetUserFilePath();
+        try
+        {
+            var dir = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+        }
+        catch { /* ignore */ }
+
+        try
+        {
+            string serialized = JsonUtility.ToJson(container, prettyPrint: true);
+            File.WriteAllText(path, serialized);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"ExperimentMenu: failed to write UserData.json: {ex.Message}");
+        }
     }
 
     private string GetUserFilePath()

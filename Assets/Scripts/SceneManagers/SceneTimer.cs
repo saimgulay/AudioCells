@@ -3,7 +3,8 @@
 // stops EEG recording (if present), then:
 //  - If "Enable Survey" is ticked: shows a large IMGUI survey UI (NASA-TLX + short IEQ + Genomics Audibility),
 //    asking ONE question per page, writes SPSS-friendly flat JSON + human summary,
-//    then redirects to the target scene.
+//    then redirects to the target scene. At the end, additionally asks for ONE WORD
+//    that best describes the scene (saved into both JSON outputs).
 //  - If unticked: skips surveys, shows a brief opaque notice, and redirects after a delay.
 //
 // Logging (when surveys are enabled):
@@ -91,7 +92,8 @@ public class SceneTimer : MonoBehaviour
     private int _gaIndex  = 0; // 0..1
 
     // ---- styles (built once) ----
-    private GUIStyle _lbl, _hdr, _subtle, _btn, _note, _progress, _title, _windowStyle, _banner;
+    private GUIStyle _lbl, _hdr, _subtle, _btn, _note, _progress, _title, _windowStyle, _banner, _input;
+
     private Texture2D _windowBgTex;
 
     // NASA-TLX responses (0..20; higher = more demanding; Performance: higher = worse)
@@ -109,6 +111,10 @@ public class SceneTimer : MonoBehaviour
     // 1) "I could comfortably hear changes in the genomic parameters."
     // 2) "As the cells evolved, it was easy to listen to their changes."
     private int _ga1 = 3, _ga2 = 3;
+
+    // One-word scene summary (free text; saved as a single token)
+    private string _sceneOneWord = "";
+    private bool _oneWordFocusRequested = false;
 
     // Persistent banner string (British English)
     private const string TopNotice = "Please answer only based on the scene you have just experienced.";
@@ -444,7 +450,7 @@ public class SceneTimer : MonoBehaviour
         if (GUILayout.Button(_gaIndex == total - 1 ? "Review & Submit" : "Next", _btn, GUILayout.Width(220)))
         {
             if (_gaIndex < total - 1) _gaIndex++;
-            else _stage = FlowStage.Submit;
+            else { _stage = FlowStage.Submit; _oneWordFocusRequested = false; }
         }
         GUILayout.EndHorizontal();
     }
@@ -481,13 +487,28 @@ public class SceneTimer : MonoBehaviour
         GUILayout.Label($"1:{_ga1}  2:{_ga2}", _lbl, GUILayout.MaxWidth(w));
         GUILayout.Label($"Mean: {gaMean:0.00}/5", _lbl);
 
+        // --- One-word scene summary (free text, saved as a single token) ---
+        GUILayout.Space(12);
+        GUILayout.Label("<b>One-word summary</b>", _hdr, GUILayout.MaxWidth(w));
+        GUILayout.Label("Please enter a single word that best describes this scene (no spaces). Only the first word and letters/digits/‘-’/‘_’ will be saved.", _note, GUILayout.MaxWidth(w));
+
+        if (!_oneWordFocusRequested)
+        {
+            GUI.SetNextControlName("sceneOneWordField");
+            _oneWordFocusRequested = true;
+        }
+        _sceneOneWord = GUILayout.TextField(_sceneOneWord ?? "", 64, _input, GUILayout.MaxWidth(Mathf.Min(360f, w)));
+
+        string willSaveAs = SanitizeOneWord(_sceneOneWord);
+        GUILayout.Label($"Will be saved as: <b>{(string.IsNullOrEmpty(willSaveAs) ? "<empty>" : willSaveAs)}</b>", _subtle, GUILayout.MaxWidth(w));
+
         GUILayout.Space(14);
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Back", _btn, GUILayout.Width(160))) _stage = FlowStage.GENOMICS_AUD;
         GUILayout.FlexibleSpace();
         if (GUILayout.Button("Submit & Continue", _btn, GUILayout.Width(260)))
         {
-            TryWriteSurveysToJson(); // SPSS-friendly flat + human summary
+            TryWriteSurveysToJson(); // SPSS-friendly flat + human summary (includes one-word)
             _stage = FlowStage.Thanks;
             _redirectScheduled = true;
             _redirectAtUnscaled = Time.unscaledTime + postSurveyRedirectDelay;
@@ -529,6 +550,8 @@ public class SceneTimer : MonoBehaviour
         _note = new GUIStyle(_lbl) { fontSize = 15, normal = { textColor = new Color(0.85f, 0.85f, 0.85f, 0.95f) } };
         _progress = new GUIStyle(_subtle) { alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Italic };
         _btn = new GUIStyle(GUI.skin.button) { fontSize = 16, fixedHeight = 38, padding = new RectOffset(14, 14, 8, 8) };
+
+        _input = new GUIStyle(GUI.skin.textField) { fontSize = 16, padding = new RectOffset(8, 8, 6, 6) };
 
         // OPAQUE window background (no translucency)
         if (_windowBgTex == null)
@@ -893,6 +916,8 @@ public class SceneTimer : MonoBehaviour
 
             float gaMean = (_ga1 + _ga2) / 2f;
 
+            string sceneWordSaved = SanitizeOneWord(_sceneOneWord);
+
             // ---- SPSS-friendly FLAT payload (one row) ----
             var flat = new CombinedSurveyFlat
             {
@@ -925,7 +950,9 @@ public class SceneTimer : MonoBehaviour
 
                 aud_1 = _ga1,
                 aud_2 = _ga2,
-                aud_mean = gaMean
+                aud_mean = gaMean,
+
+                scene_one_word = sceneWordSaved
             };
 
             // ---- HUMAN-readable combined text ----
@@ -958,6 +985,8 @@ public class SceneTimer : MonoBehaviour
                 .AppendLine($"1. Comfortably heard genomic parameter changes — {_ga1}/5")
                 .AppendLine($"2. Easy to listen to cells’ changes as they evolved — {_ga2}/5")
                 .AppendLine($"Mean: {gaMean:0.00}/5")
+                .AppendLine()
+                .AppendLine($"One-word scene summary: {(string.IsNullOrEmpty(sceneWordSaved) ? "<empty>" : sceneWordSaved)}")
                 .ToString();
 
             // ---- Write samples: FLAT + TEXT ----
@@ -966,7 +995,7 @@ public class SceneTimer : MonoBehaviour
                 tIso = nowIso,
                 type = "survey_flat",
                 label = JsonUtility.ToJson(flat), // flat keys only (SPSS-friendly)
-                count = 16, // 6 TLX + 8 IEQ + 2 Audibility
+                count = 17, // 6 TLX + 8 IEQ + 2 Audibility + 1 one-word
                 score = Mathf.RoundToInt(ieqMeanRev100) // quick-glance (keep IEQ as overall immersion score)
             };
             var textSample = new Sample
@@ -974,7 +1003,7 @@ public class SceneTimer : MonoBehaviour
                 tIso = nowIso,
                 type = "survey_text",
                 label = text,
-                count = 16
+                count = 17
             };
 
             sess.samples.Add(flatSample);
@@ -982,7 +1011,7 @@ public class SceneTimer : MonoBehaviour
 
             TouchUpdated(ext, user);
             WriteJsonAtomic(path, JsonUtility.ToJson(ext, true));
-            Debug.Log("[SceneTimer] Survey responses written: survey_flat + survey_text.");
+            Debug.Log("[SceneTimer] Survey responses written: survey_flat + survey_text (includes one-word).");
         }
         catch (Exception ex)
         {
@@ -1171,5 +1200,31 @@ public class SceneTimer : MonoBehaviour
         // Genomics Audibility (1..5)
         public int aud_1, aud_2;
         public float aud_mean; // 1..5
+
+        // One-word scene summary (sanitised single token)
+        public string scene_one_word;
+    }
+
+    // ---- utilities -----------------------------------------------------------
+
+    private static string SanitizeOneWord(string input, int maxLen = 32)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return "";
+        var trimmed = input.Trim();
+
+        // Take first whitespace-delimited token
+        var parts = trimmed.Split(new char[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        string first = parts.Length > 0 ? parts[0] : "";
+
+        // Keep only letters/digits and '-' or '_'
+        var sb = new StringBuilder();
+        for (int i = 0; i < first.Length; i++)
+        {
+            char ch = first[i];
+            if (char.IsLetterOrDigit(ch) || ch == '-' || ch == '_') sb.Append(ch);
+        }
+        string res = sb.ToString();
+        if (res.Length > maxLen) res = res.Substring(0, maxLen);
+        return res;
     }
 }
