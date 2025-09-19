@@ -1,0 +1,49 @@
+git add .gitignore
+git commit -m "Add Unity .gitignore"
+
+for p in Library Temp Obj Build Builds Logs UserSettings MemoryCaptures Artifacts; do
+  git rm -r --cached "$p" 2>/dev/null || true
+done
+git rm -r --cached .vs .idea .vscode 2>/dev/null || true
+git rm --cached *.sln *.csproj *.user *.unityproj *.suo *.tmp *.pdb *.mdb *.opendb *.VC.db *.VC.VC.opendb 2>/dev/null || true
+
+git commit -m "Untrack generated & IDE files per .gitignore"
+git push origin main
+
+# macOS
+.DS_Store
+
+
+
+
+
+x^X
+
+
+^x
+^X
+Xx
+xx
+# Unity generated/cache
+[Ll]ibrary/
+[Tt]emp/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Oo]bj/
+UserSettings/
+MemoryCaptures/
+[Bb]urst*/
+**/ShaderCache/
+
+# IDE / project files
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.mdb
+
+# Misc
+*.tmp
